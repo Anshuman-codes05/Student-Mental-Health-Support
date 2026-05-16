@@ -1,4 +1,4 @@
-# DMHS - Student Mental Health Support Platform
+# Student Wellness Hub — Mental Health Support Platform
 
 A comprehensive mental health support platform designed specifically for students, featuring mood tracking, journaling, peer support forums, AI-powered chatbot, and resource management.
 
@@ -54,7 +54,7 @@ A comprehensive mental health support platform designed specifically for student
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/dmhs-starter-react-firebase-openai.git
+   git clone https://github.com/Anshuman-codes05/Student-Mental-Health-Support.git
    cd dmhs-starter-react-firebase-openai
    ```
 
@@ -211,7 +211,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **Anshuman**
-- GitHub: [@yourusername](https://github.com/yourusername)
+- GitHub: [@Anshuman-codes05](https://github.com/Anshuman-codes05)
 - Email: anshuman@example.com
 
 ## 🙏 Acknowledgments
@@ -225,7 +225,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 If you have any questions or need help, please:
-1. Check the [Issues](https://github.com/yourusername/dmhs-starter-react-firebase-openai/issues) page
+1. Check the [Issues](https://github.com/Anshuman-codes05/Student-Mental-Health-Support/issues) page
 2. Create a new issue if your problem isn't already reported
 3. Contact the maintainer directly
 
