@@ -1,8 +1,8 @@
 import React, { useState, useEffect, createContext, useContext } from "react";
-import { BrowserRouter as Router, Routes, Route, NavLink, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "./firebase";
-import { motion } from "framer-motion"; // Import motion
+import { motion, AnimatePresence } from "framer-motion";
 
 import MoodTracker from "./MoodTracker";
 import Journal from "./Journal";
@@ -10,18 +10,16 @@ import Forum from "./Forum";
 import Chatbot from "./Chatbot";
 import Login from "./Login";
 import Signup from "./Signup";
-import Booking from "./Booking"; // Import Booking component
-import ResourceHub from "./ResourceHub"; // Import ResourceHub component
-import AdminDashboard from "./AdminDashboard"; // Import AdminDashboard component
+import Booking from "./Booking";
+import ResourceHub from "./ResourceHub";
+import AdminDashboard from "./AdminDashboard";
 
-// Create an Auth Context
 export const AuthContext = createContext(null);
 
-// Auth Provider component to manage and provide auth state
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
-  const [loadingAuth, setLoadingAuth] = useState(true); // Tracks if Firebase is still checking auth state
-  const navigate = useNavigate(); // For redirecting after logout
+  const [loadingAuth, setLoadingAuth] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -32,10 +30,10 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = async () => {
-    setLoadingAuth(true); // Indicate that logout is in progress
+    setLoadingAuth(true);
     try {
       await signOut(auth);
-      navigate('/login'); // Redirect to login page after logout
+      navigate("/login");
     } catch (error) {
       console.error("Error during logout:", error);
     } finally {
@@ -43,14 +41,8 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const value = {
-    currentUser,
-    loadingAuth,
-    logout,
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ currentUser, loadingAuth, logout }}>
       {!loadingAuth && children}
     </AuthContext.Provider>
   );
@@ -58,212 +50,214 @@ export function AuthProvider({ children }) {
 
 function App() {
   const { currentUser, loadingAuth, logout } = useContext(AuthContext);
+  const location = useLocation();
+  const isAuthPage = ["/login", "/signup"].includes(location.pathname);
 
   const navLinkClasses = ({ isActive }) =>
-    `px-4 py-2 rounded-xl text-base font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 ` +
-    (isActive
-      ? "bg-white/20 text-white shadow-soft backdrop-blur-sm border border-white/30 focus:ring-white/50 focus:ring-offset-primary"
-      : "text-white/90 hover:bg-white/10 hover:text-white focus:ring-white/50 focus:ring-offset-primary");
+    `nav-pill ${isActive ? "nav-pill-active" : ""}`;
 
   return (
     <motion.div
-      className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background text-text-primary font-sans flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden"
+      className="relative flex min-h-screen flex-col text-text-primary"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
+      transition={{ duration: 0.6 }}
     >
-      {/* Enhanced Background Elements */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-      <div className="absolute bottom-0 right-0 w-72 h-72 bg-secondary-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
-      <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-accent-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-6000"></div>
-      <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-primary-100 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-blob animation-delay-8000"></div>
+      {/* Floating accent blobs inside app layer */}
+      <motion.div
+        className="pointer-events-none absolute -left-32 top-20 h-64 w-64 rounded-full bg-primary-600/30 blur-3xl"
+        animate={{ y: [0, -20, 0], x: [0, 15, 0] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="pointer-events-none absolute -right-24 top-1/3 h-72 w-72 rounded-full bg-secondary/25 blur-3xl"
+        animate={{ y: [0, 25, 0], x: [0, -20, 0] }}
+        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+      />
 
-      {/* Enhanced Navigation Bar */}
+      {/* Navigation */}
       <motion.nav
-        className="w-full sticky top-0 z-50 bg-gradient-to-r from-primary/90 to-secondary/90 backdrop-blur-lg border-b border-white/20 shadow-large rounded-b-3xl mb-8 py-2"
-        initial={{ y: -100, opacity: 0 }}
+        className="sticky top-0 z-50 w-full px-4 pt-5 sm:px-6"
+        initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 120, damping: 14, delay: 0.2 }}
+        transition={{ type: "spring", stiffness: 120, damping: 18, delay: 0.1 }}
       >
-        <div className="container mx-auto flex flex-wrap justify-center sm:justify-between items-center py-4 px-4 sm:px-8">
-          <motion.div 
-            className="flex items-center space-x-3 mb-4 sm:mb-0"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            <div className="relative">
-              <img src="/vite.svg" className="h-12 w-12 animate-bounce-gentle" alt="Logo" />
-              <div className="absolute inset-0 bg-primary-400 rounded-full blur-md opacity-30 animate-pulse-soft"></div>
+        <div className="glass-panel-strong mx-auto flex max-w-7xl flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <motion.div className="flex items-center gap-4" whileHover={{ scale: 1.02 }}>
+            <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 via-secondary to-accent text-xl shadow-glow">
+              <span className="animate-wave">✨</span>
+              <span className="absolute -inset-0.5 rounded-2xl bg-gradient-to-br from-primary-400 to-secondary opacity-40 blur-md" />
             </div>
-            <span className="text-2xl font-heading font-bold text-white tracking-wide">DMHS</span>
-            <span className="text-sm font-medium text-white/80 hidden sm:block">Mental Health Support</span>
+            <div>
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-text-muted">
+                Wellness HQ
+              </p>
+              <h2 className="font-heading text-xl font-bold text-gradient sm:text-2xl">
+                Student Wellness Hub
+              </h2>
+            </div>
           </motion.div>
-          <div className="flex flex-wrap justify-center space-x-4 sm:space-x-6">
+
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
             {!loadingAuth && currentUser ? (
-              // Authenticated navigation
               <>
-                <NavLink to="/" className={navLinkClasses}>
-                  Mood Tracker
-                </NavLink>
-                <NavLink to="/journal" className={navLinkClasses}>
-                  Journal
-                </NavLink>
-                <NavLink to="/forum" className={navLinkClasses}>
-                  Forum
-                </NavLink>
-                <NavLink to="/chatbot" className={navLinkClasses}>
-                  Chatbot
-                </NavLink>
-                <NavLink to="/booking" className={navLinkClasses}> {/* New NavLink for Booking */}
-                  Bookings
-                </NavLink>
-                <NavLink to="/resources" className={navLinkClasses}> {/* New NavLink for Resource Hub */}
-                  Resources
-                </NavLink>
+                <NavLink to="/" end className={navLinkClasses}>Mood</NavLink>
+                <NavLink to="/journal" className={navLinkClasses}>Journal</NavLink>
+                <NavLink to="/forum" className={navLinkClasses}>Forum</NavLink>
+                <NavLink to="/chatbot" className={navLinkClasses}>Chatbot</NavLink>
+                <NavLink to="/booking" className={navLinkClasses}>Bookings</NavLink>
+                <NavLink to="/resources" className={navLinkClasses}>Resources</NavLink>
                 {currentUser.email === "admin@example.com" && (
-                  <NavLink to="/admin" className={navLinkClasses}> {/* New NavLink for Admin Dashboard */}
-                    Admin
-                  </NavLink>
+                  <NavLink to="/admin" className={navLinkClasses}>Admin</NavLink>
                 )}
                 <motion.button
+                  type="button"
                   onClick={logout}
-                  className="px-4 py-2 rounded-xl text-base font-medium transition-all duration-300 text-white bg-error-500 hover:bg-error-600 shadow-soft focus:outline-none focus:ring-2 focus:ring-error-500 focus:ring-offset-2 focus:ring-offset-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn-ghost-danger"
                   disabled={loadingAuth}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
                 >
                   Logout
                 </motion.button>
               </>
             ) : (
-              // Unauthenticated navigation
               <>
-                <NavLink to="/login" className={navLinkClasses}>
-                  Login
-                </NavLink>
-                <NavLink to="/signup" className={navLinkClasses}>
-                  Sign Up
-                </NavLink>
+                <NavLink to="/login" className={navLinkClasses}>Login</NavLink>
+                <NavLink to="/signup" className={navLinkClasses}>Sign Up</NavLink>
               </>
             )}
           </div>
         </div>
       </motion.nav>
 
-      {/* Enhanced Header */}
-      <motion.header
-        className="mt-12 mb-10 text-center px-4 max-w-5xl"
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
-      >
-        <motion.h1 
-          className="text-4xl sm:text-6xl lg:text-7xl font-heading font-extrabold mb-6 leading-tight text-primary text-shadow-md"
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.6, duration: 0.5, ease: "easeOut" }}
+      {/* Hero — hidden on login/signup for cleaner auth pages */}
+      {!isAuthPage && (
+        <motion.header
+          className="mx-auto mt-10 w-full max-w-5xl px-4 sm:px-6"
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          <span className="inline-block animate-wave text-5xl sm:text-7xl lg:text-8xl">👋</span>
-          <br />
-          <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            DMHS
-          </span>
-          <br />
-          <span className="text-2xl sm:text-3xl lg:text-4xl text-text-secondary font-medium">
-            Student Mental Health Support
-          </span>
-        </motion.h1>
-        <motion.p 
-          className="text-lg sm:text-xl lg:text-2xl text-text-secondary max-w-3xl mx-auto leading-relaxed font-medium"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
-        >
-          Track your mood, journal your thoughts, connect with peers, and chat with AI support — all in one beautiful, supportive environment.
-        </motion.p>
-      </motion.header>
+          <div className="hero-panel relative px-6 py-10 sm:px-12 sm:py-14">
+            <div className="pointer-events-none absolute -right-8 -top-8 h-48 w-48 rounded-full bg-primary-500/25 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-10 -left-6 h-40 w-40 rounded-full bg-secondary/20 blur-3xl" />
 
-      {/* Enhanced Main Content Area */}
-      <motion.main
-        className="flex-grow w-full container mx-auto px-4 max-w-7xl mb-12"
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
-        layout /* Add layout prop for smoother transitions between route changes */
-      >
-        <motion.div
-          className="bg-white rounded-3xl shadow-large p-6 sm:p-8 lg:p-12 border border-gray-100 hover:shadow-glow transition-all duration-500 transform hover:scale-[1.01] relative overflow-hidden backdrop-blur-sm"
-          initial={{ scale: 0.98, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.5, ease: "easeOut" }}
-        >
-          {/* Subtle background pattern */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-50/30 via-transparent to-secondary-50/30 pointer-events-none"></div>
-          <div className="relative z-10">
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+            <span className="premium-badge">
+              <span className="premium-badge-dot" />
+              Premium Experience
+            </span>
 
-              {/* Protected Routes (only accessible when currentUser is set) */}
-              {(!loadingAuth && currentUser) ? (
-                <>
-                  <Route path="/" element={<MoodTracker />} />
-                  <Route path="/journal" element={<Journal />} />
-                  <Route path="/forum" element={<Forum />} />
-                  <Route path="/chatbot" element={<Chatbot />} />
-                  <Route path="/booking" element={<Booking />} /> {/* New Protected Route for Booking */}
-                  <Route path="/resources" element={<ResourceHub />} /> {/* New Protected Route for Resource Hub */}
-                  {currentUser.email === "admin@example.com" && (
-                    <Route path="/admin" element={<AdminDashboard />} /> // New Protected Route for Admin Dashboard
-                  )}
-                </>
-              ) : (
-                // Redirect unauthenticated users from protected routes to login
-                <Route path="*" element={<Login />} />
+            <motion.h1
+              className="relative mt-6 font-heading text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl lg:text-5xl"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+            >
+              <span className="text-gradient">Beautiful mental health support</span>
+              <span className="mt-2 block text-text-primary">
+                — calm, premium, and empowering.
+              </span>
+            </motion.h1>
+
+            <motion.p
+              className="relative mt-5 max-w-2xl text-base leading-relaxed text-text-secondary sm:text-lg"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.45 }}
+            >
+              Mood tracking, journaling, peer connection, and AI guidance — wrapped in elegant, thoughtful design.
+            </motion.p>
+
+            <motion.div
+              className="relative mt-8 flex flex-col gap-3 sm:flex-row sm:items-center"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 }}
+            >
+              <NavLink to={currentUser ? "/" : "/signup"} className="btn-primary px-8 py-3">
+                {currentUser ? "Open dashboard" : "Get started free"}
+              </NavLink>
+              {!currentUser && (
+                <NavLink to="/login" className="btn-outline px-8 py-3">
+                  Sign in
+                </NavLink>
               )}
-            </Routes>
+            </motion.div>
           </div>
+        </motion.header>
+      )}
+
+      {/* Main content */}
+      <motion.main
+        className="mx-auto mb-12 mt-8 w-full max-w-7xl flex-grow px-4 sm:px-6"
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.35, duration: 0.7 }}
+      >
+        <motion.div className="content-shell p-5 sm:p-8 lg:p-10" layout>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              className="page-enter"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.35 }}
+            >
+              <Routes location={location}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+
+                {!loadingAuth && currentUser ? (
+                  <>
+                    <Route path="/" element={<MoodTracker />} />
+                    <Route path="/journal" element={<Journal />} />
+                    <Route path="/forum" element={<Forum />} />
+                    <Route path="/chatbot" element={<Chatbot />} />
+                    <Route path="/booking" element={<Booking />} />
+                    <Route path="/resources" element={<ResourceHub />} />
+                    {currentUser.email === "admin@example.com" && (
+                      <Route path="/admin" element={<AdminDashboard />} />
+                    )}
+                  </>
+                ) : (
+                  <Route path="*" element={<Login />} />
+                )}
+              </Routes>
+            </motion.div>
+          </AnimatePresence>
         </motion.div>
       </motion.main>
 
-      {/* Enhanced Footer */}
+      {/* Footer */}
       <motion.footer
-        className="w-full bg-gradient-to-r from-primary via-primary-600 to-secondary text-white py-8 shadow-large mt-auto rounded-t-3xl border-t border-white/10"
-        initial={{ y: 100 }}
-        animate={{ y: 0 }}
-        transition={{ type: "spring", stiffness: 120, damping: 14, delay: 0.8 }}
+        className="mt-auto border-t border-white/10 bg-gradient-to-r from-primary-900/80 via-background-secondary/90 to-primary-900/80 px-4 py-8 backdrop-blur-xl"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
       >
-        <div className="container mx-auto text-center px-4">
-          <motion.div
-            className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.6 }}
-          >
-            <p className="text-sm sm:text-base opacity-90">
-              Made with <span className="text-red-300 animate-pulse-soft">💜</span> by <span className="font-semibold">Anshuman</span>
-            </p>
-            <span className="hidden sm:block text-white/50">|</span>
-            <p className="text-sm sm:text-base opacity-90">
-              DMHS Project © {new Date().getFullYear()}
-            </p>
-          </motion.div>
-          <motion.p 
-            className="text-xs opacity-70 mt-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.7 }}
-            transition={{ delay: 1.2, duration: 0.6 }}
-          >
-            Supporting student mental health through technology
-          </motion.p>
-        </div>
+        <motion.div
+          className="mx-auto flex max-w-4xl flex-col items-center justify-center gap-2 text-center sm:flex-row sm:gap-4"
+          initial={{ y: 20 }}
+          animate={{ y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <p className="text-sm text-text-secondary">
+            Made with <span className="inline-block animate-pulse-soft text-secondary">💜</span> by{" "}
+            <span className="font-semibold text-text-primary">Anshuman</span>
+          </p>
+          <span className="hidden text-white/30 sm:inline">|</span>
+          <p className="text-sm text-text-muted">Student Wellness Hub © {new Date().getFullYear()}</p>
+        </motion.div>
+        <p className="mt-2 text-center text-xs text-text-muted">
+          Supporting student mental health through technology
+        </p>
       </motion.footer>
     </motion.div>
   );
 }
 
-// Wrap App with AuthProvider to provide auth context globally
 export default function AppWithAuth() {
   return (
     <Router>
@@ -273,4 +267,3 @@ export default function AppWithAuth() {
     </Router>
   );
 }
-

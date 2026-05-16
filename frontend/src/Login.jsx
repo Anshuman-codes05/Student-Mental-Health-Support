@@ -29,13 +29,13 @@ export default function Login() {
 
   return (
     <motion.div
-      className="flex items-center justify-center min-h-[calc(100vh-80px)] p-4 bg-background"
+      className="flex min-h-[50vh] items-center justify-center p-2"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
       <motion.div
-        className="w-full max-w-md p-8 space-y-8 bg-white rounded-3xl shadow-large border border-gray-100 transform transition duration-500 hover:scale-[1.01]"
+        className="glass-panel w-full max-w-md space-y-8 p-8 sm:p-10"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
@@ -49,7 +49,7 @@ export default function Login() {
           >
             <span className="text-2xl">👋</span>
           </motion.div>
-          <h2 className="text-4xl font-heading font-extrabold text-primary tracking-tight">
+          <h2 className="font-heading text-4xl font-extrabold tracking-tight text-gradient">
             Welcome Back!
           </h2>
           <p className="text-lg text-text-secondary">
@@ -58,7 +58,7 @@ export default function Login() {
         </div>
         {error && (
           <motion.div
-            className="p-4 text-sm text-error-700 bg-error-50 rounded-xl border border-error-200"
+            className="rounded-xl border border-error-500/40 bg-error-500/15 p-4 text-sm text-error-400"
             role="alert"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -128,7 +128,7 @@ export default function Login() {
           </motion.div>
         </form>
         <motion.div
-          className="text-center pt-4 border-t border-gray-100"
+          className="border-t border-white/10 pt-4 text-center"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.3 }}
@@ -136,7 +136,7 @@ export default function Login() {
           <p className="text-text-secondary mb-2">Don't have an account?</p>
           <Link 
             to="/signup" 
-            className="font-medium text-primary hover:text-primary-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg px-3 py-1"
+            className="rounded-lg px-3 py-1 font-medium text-primary-300 transition hover:text-white"
           >
             Sign Up
           </Link>

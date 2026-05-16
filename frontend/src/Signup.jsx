@@ -36,13 +36,13 @@ export default function Signup() {
 
   return (
     <motion.div
-      className="flex items-center justify-center min-h-[calc(100vh-80px)] p-4 bg-background"
+      className="flex min-h-[50vh] items-center justify-center p-2"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
       <motion.div
-        className="w-full max-w-md p-8 space-y-8 bg-white rounded-3xl shadow-large border border-gray-100 transform transition duration-500 hover:scale-[1.01]"
+        className="glass-panel w-full max-w-md space-y-8 p-8 sm:p-10"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
@@ -56,7 +56,7 @@ export default function Signup() {
           >
             <span className="text-2xl">✨</span>
           </motion.div>
-          <h2 className="text-4xl font-heading font-extrabold text-primary tracking-tight">
+          <h2 className="font-heading text-4xl font-extrabold tracking-tight text-gradient">
             Join Us Today!
           </h2>
           <p className="text-lg text-text-secondary">
